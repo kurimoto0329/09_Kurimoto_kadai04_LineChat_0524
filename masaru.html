@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+  <!-- fontawesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+<link rel="stylesheet" href="css/reset.css">
+<link rel="stylesheet" href="css/sample.css">
+<link rel="stylesheet" href="css/style.css">
+<title>Chatアプリ</title>
+</head>
+<body>
+
+<!-- コンテンツ表示画面 -->
+
+<!-- ▼LINE風 ここから -->
+<div class="line__container">
+  <!-- タイトル -->
+  <div class="line__title">
+    家族チャット
+  </div>
+  <!-- ▼会話エリア scrollを外すと高さ固定解除 -->
+  <div class="line__contents scroll" id = "scroll">
+
+    <!-- 相手の吹き出し -->
+    <div id = "output" ></div>
+    <div id = "output_end" ></div>
+
+  </div>
+  <footer>
+    <div>
+      <input type="text" id ="uname" value="名前" style = "width:320px; height:30px; margin-bottom: 5px;">
+    </div>
+    <div style ="display: flex; justify-content: space-between;">
+      <input type="text" id="text" value="メッセージ" style = "width:320px; height:50px;"></input>
+      <img src="imgs/send_btn_icon.png" id = "send" style = "height:30px; vertical-align: middle;">
+      <!-- <button id="send" style="height: 30px; width:60px; vertical-align: middle;">送信</button> -->
+      <a href="#output_end" class="btn-pagebottom"><span class="fa fa-angle-down icon-up"></span></a>
+    </div>
+  </footer>
+</div>
+
+
+
+
+
+<!-- <main>
+    <h1 class ="header">家族</h1>
+    <div id ="output"></div>
+
+</main>
+
+ -->
+
+<!--/ コンテンツ表示画面 -->
+
+
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- JQuery -->
+
+
+<!--** 以下Firebase **-->
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCAXCDjhK5yH7BkDjlar3w8c_BYnnixDPQ",
+    authDomain: "gsdemo-d8803.firebaseapp.com",
+    projectId: "gsdemo-d8803",
+    storageBucket: "gsdemo-d8803.appspot.com",
+    messagingSenderId: "831949431857",
+    appId: "1:831949431857:web:b27881a97d3d2391776110"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+  const ref = firebase.database().ref(); 
+
+  let uid = "優";
+
+//送信
+$("#send").on("click", function(){
+    const uname = $("#uname").val();
+    uid = uname;
+    const text = $("#text").val();
+    const DD = new Date();
+    const year = DD.getFullYear() + '年';
+    const month = DD.getMonth() +1 + '月';
+    const date = DD.getDate() + '日';
+    const hour = DD.getHours()+ '時';
+    const minute = DD.getMinutes()+ '分';
+    const msg = {
+        uname: uname,
+        text: text,
+        year: year,
+        month: month,
+        date: date,
+        hour: hour,
+        minute: minute
+    }
+    ref.push(msg);//送信処理
+    console.log(msg);
+});
+
+let icon;
+
+ref.on("child_added",function(data){
+    const v = data.val();
+    console.log(v);
+    const k = data.key;
+    let icon;
+    let h ;
+    // console.log(v.uname);
+    if (v.uname == "優"){
+      icon ='"./imgs/masaru.jpg"';
+    } else if (v.uname == "祐子"){
+      icon ='"./imgs/yuko.JPG"';
+      
+    } else if (v.uname == "陽奈子"){
+      icon ='"./imgs/hinako.jpg"';
+    } else if (v.uname == "莉佳"){
+      icon ='"./imgs/rika.jpg"';
+    } else {
+      icon ='"./imgs/buke.png"';
+    }
+    
+    if (v.uname == "優"){
+      h = '<div class= "line__right"><div class="text">'+v.text+'</div><span class="date">'+v.hour + v.minute+'</span></div>';
+    } else {
+      h = '<div class= "line__left"><figure><img src='+ icon +'/></figure><div class="line__left-text"><div class="name">'+v.uname+'</div><div class="text">'+v.text+'</div><span class="date">'+v.hour + v.minute+'</span></div></div>';
+    }
+    var audioElem1 = new Audio();
+    audioElem1.src = "./sound/sound_effect.mp3";
+    audioElem1.play();
+    $("#output").append(h);
+    $('#scroll').animate({scrollTop: $('#scroll')[0].scrollHeight}, 'fast');
+
+});
+
+
+
+</script>
+<script type="text/javascript">
+    var textbox = document.getElementById( 'uname' );
+  
+    // 入力フォーカスを得たときの処理
+    textbox.onfocus = function()
+    {
+        if( this.value == this.defaultValue )
+        {
+            this.value = '';
+            this.style.color = '';
+        }
+    }
+  
+    // 入力フォーカスを失ったときの処理
+    textbox.onblur = function()
+    {
+        if( this.value == '' )
+        {
+            this.value = this.defaultValue;
+            this.style.color = 'gray';
+        }
+    }
+  
+    // 透かし文字をdefaultValueプロパティで保持する
+    textbox.defaultValue = textbox.value;
+    textbox.value = '';
+  
+    textbox.onblur();
+////////////////////////////////////////////////////////////////////
+    var textbox = document.getElementById( 'text' );
+  
+    // 入力フォーカスを得たときの処理
+    textbox.onfocus = function()
+    {
+        if( this.value == this.defaultValue )
+        {
+            this.value = '';
+            this.style.color = '';
+        }
+    }
+  
+    // 入力フォーカスを失ったときの処理
+    textbox.onblur = function()
+    {
+        if( this.value == '' )
+        {
+            this.value = this.defaultValue;
+            this.style.color = 'gray';
+        }
+    }
+  
+    // 透かし文字をdefaultValueプロパティで保持する
+    textbox.defaultValue = textbox.value;
+    textbox.value = '';
+  
+    textbox.onblur();
+
+  </script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
